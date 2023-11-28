@@ -1,6 +1,8 @@
 from core.config import setting
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from database.dbmodel import Base
+from database.database import engine
 from router.admin_route import adm_app
 from router.auth_route import auth_app
 from router.gen_route import gen_app
@@ -9,7 +11,7 @@ from router.stud_route import stud_app
 
 
 #read metadata, and instructing it to create tables using base schema.
-# Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 #FastAPI Matadata.
 app = FastAPI(  
