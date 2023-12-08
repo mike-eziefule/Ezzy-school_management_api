@@ -42,3 +42,16 @@ class reusables_codes:
             yield db
         finally:
             db.close()
+    
+    @staticmethod
+    def gen_matric_no(id):
+        
+        matric_no = ''.join(f"{setting.matric_no}{1000+id}")
+        return matric_no
+    
+    @staticmethod
+    def gen_staff_id(id):
+        
+        staff_no = ''.join(f"{setting.staff_initials}{500+id}")
+        return staff_no
+    

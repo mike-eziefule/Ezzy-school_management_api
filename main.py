@@ -1,8 +1,9 @@
 from core.config import setting
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database.dbmodel import Base
 from database.database import engine
+from router.user_route import user_app
 from router.admin_route import adm_app
 from router.auth_route import auth_app
 from router.gen_route import gen_app
@@ -34,8 +35,9 @@ app.add_middleware(
 )
 
 #connecting routes to main.py file
+app.include_router(user_app, prefix='/user', tags=['User'])
 app.include_router(auth_app, prefix='/auth', tags=['Auth'])
-app.include_router(adm_app, prefix='/admin', tags=['Administrator'])
-app.include_router(gen_app, prefix='/gen', tags=['General'])
-app.include_router(lect_app, prefix='/Lect', tags=['Lecturer'])
+app.include_router(adm_app, prefix='/admin', tags=['Admin'])
+app.include_router(gen_app, prefix='/misc', tags=['Others'])
+app.include_router(lect_app, prefix='/staff', tags=['Staff'])
 app.include_router(stud_app, prefix='/stud', tags=['Student'])
