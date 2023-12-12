@@ -38,3 +38,11 @@ class ShowUser(CreateUser):
     id : int
     class Config:
         orm_mode = True
+
+class ShowCourses(BaseModel):
+    student : str
+    courses: str
+    lecturer : list[str] = []
+    status: str
+    class Config:
+        orm_mode = True

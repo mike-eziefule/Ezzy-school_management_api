@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schema.user_schema import CreateAdmin, CreateStudent, EditUser, ShowUser
+from schema.user_schema import CreateStudent, EditUser, ShowUser, ShowCourses
 from schema.course_schema import CourseRegister
 from sqlalchemy.orm import Session
 from service.utils import reusables_codes
-from database.dbmodel import User, Students, Courses, Student_course, Lecturers
+from database.dbmodel import Students, Courses, Student_course
 from router.auth_route import oauth2_scheme
+from typing import Any
+
 
 
 
@@ -74,9 +76,25 @@ async def new_course(input: CourseRegister, db:Session=Depends(reusables_codes.g
         lecturer = get_lect.lecturer_id,
         status = "Registered",
     )
-        
     db.add(new_student)
     db.commit()
     db.refresh(new_student)
     return f"COURSE >> {input.courses} : {get_lect.course_name} << SUCCESSFULLY REGISTERED"
     
+#VIEW REGISTERED COURSES BY STUDENT
+@stud_app.get('/my_courses')
+async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+
+    #authentication
+    user = reusables_codes.get_user_from_token(db, token)
+    
+    #verify student's matric_no.
+    get_student = db.query(Students).filter(Students.owner_id == user.id).first()
+    
+    #verify student's matric_no.
+    view_course = db.query(Student_course).filter(Student_course.student == get_student.matric_no).all()
+    course_list = []
+    for course in view_course:
+        course_list.append(course)
+    return course_list
+        
