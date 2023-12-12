@@ -19,9 +19,11 @@ async def signup(input:CreateUser, db:Session=Depends(reusables_codes.get_db)):
     if input.password != input.retype_password:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="PASSWORD MISMATCH!!!")
     
-    new_user = User(email = input.email, 
-                    password = input.password, 
-                    user_type = input.user_type)
+    new_user = User(
+        email = input.email, 
+        password = input.password, 
+        user_type = input.user_type
+    )
     
     db.add(new_user)
     db.commit()

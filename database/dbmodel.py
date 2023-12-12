@@ -38,8 +38,7 @@ class Lecturers(Base):
     owner = relationship("User", back_populates="lecturers")
     courses = relationship("Courses", back_populates= "owner")
     lec_grade = relationship("Grading", back_populates= "owner3")
-
-
+    lec_course = relationship("Student_course", back_populates= "owner_3")
 
 class Students(Base):
     __tablename__ = 'students'
@@ -56,7 +55,7 @@ class Students(Base):
     #relationship
     owner = relationship("User", back_populates="students")
     stu_grade = relationship("Grading", back_populates= "owner1")
-
+    stu_course = relationship("Student_course", back_populates= "owner_1")
 
 class Courses(Base):
     __tablename__ = 'courses'
@@ -69,36 +68,37 @@ class Courses(Base):
     #relationship
     owner = relationship("Lecturers", back_populates="courses")
     cou_grade = relationship("Grading", back_populates= "owner2")
-
-    
-    
-    
+    cou_course = relationship("Student_course", back_populates= "owner_2")
     
 class Grading(Base):
     __tablename__ = 'grades'
 
     id = Column(Integer, primary_key=True, index=True, nullable=False)
+    lecturer_id = Column(Integer, ForeignKey("lecturers.id"))
     student_matric_no = Column(String, ForeignKey("students.matric_no"))
     course_code = Column(String, ForeignKey("courses.course_code"))
     percent_grade = Column(String(50), nullable= False)
     letter_grade = Column(String(50), nullable= False)
-    lecturer_id = Column(Integer, ForeignKey("lecturers.id"))
+    grade_point = Column(String(50), nullable= False)
     
     #relationship
     owner1 = relationship("Students", back_populates="stu_grade")
     owner2 = relationship("Courses", back_populates="cou_grade")
     owner3 = relationship("Lecturers", back_populates="lec_grade")
 
-# class Student_course(Base):
-#     __tablename__ = 'student_course'
+class Student_course(Base):
+    __tablename__ = 'student_course'
 
-#     id = Column(Integer, primary_key=True, index=True, nullable=False)
-#     student = Column(Integer, ForeignKey("students.id"))
-#     courses = Column(Integer, ForeignKey("courses.id"))
+    id = Column(Integer, primary_key=True, index=True, nullable=False)
+    student = Column(String(50), ForeignKey("students.matric_no"))
+    courses = Column(String(20), ForeignKey("courses.course_code"))
+    lecturer = Column(Integer, ForeignKey("lecturers.id"))
+    status = Column(String(50), nullable= False, default="Registered")
     
-#     #relationship
-#     courses = relationship("Courses", back_populates="courses_owner")
-#     students = relationship("Students", back_populates="Student_owner")
+    #relationship
+    owner_1 = relationship("Students", back_populates="stu_course")
+    owner_2 = relationship("Courses", back_populates="cou_course")
+    owner_3 = relationship("Lecturers", back_populates="lec_course")
 
 # class Finances(Base):
 #     __tablename__ = 'finances'
