@@ -101,7 +101,7 @@ async def grade_students(input: GradeModel, db:Session=Depends(reusables_codes.g
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="COURSE-CODE IS INCORRECT OR UNREGISTERED, TRY LATER")
     
     if get_course.lecturer_id != get_lecturer.id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"ACCESS_DENIED!!! ONLY COURSE LECTURER CAN GRADE STUDENTS")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"ACCESS_DENIED!!! YOU ARE NOT THE COURSE LECTURER")
     
 #checking if course is already graded by authenticated lecturer
     get_student_grade = db.query(Grading).all()
@@ -122,10 +122,54 @@ async def grade_students(input: GradeModel, db:Session=Depends(reusables_codes.g
                 lecturer_id = get_lecturer.id, 
                 grade_point = reusables_codes.convert_grade_to_gpa(reusables_codes.get_letter_grade(input.percent_grade))
             )
-    
             db.add(new_course)
             db.commit()
             db.refresh(new_course)
             return new_course
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"STUDENT DID NOT REGISTER FOR THIS COURSE")
 
+#SEE STUDENTS TAKING A COURSE BY COURSE LECTURER
+@lect_app.get('/my_students')
+async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+
+    #authentication
+    user = reusables_codes.get_user_from_token(db, token)
+    #get lecturers id of logged in lecturer
+    get_userid  = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
+    if not get_userid:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="YOU ARE NOT A LECTURER!!!")       
+
+    #get lecturers id of logged in lecturer
+    get_lectid = db.query(Student_course).filter(Student_course.lecturer == get_userid.id)
+    if not get_lectid.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="UNREGISTERED OR UNOFFERED COURSE")      
+
+    #get lecturers id of logged in lecturer
+    check_course = db.query(Student_course).filter(Student_course.courses == course_code).first()
+    if not check_course:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="INVALID OR UNOFFERED COURSE")      
+
+    #limit lecturer to assigned course
+    check_course = db.query(Courses).filter(Courses.lecturer_id == get_userid.id)
+    
+    if not check_course.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="INVALID OR UNOFFERED COURSE")      
+
+
+    student_list = []
+    #Iterate through list to match students with lecturers course
+    for student in get_lectid.all():
+        # print (student.courses == student.courses)
+        # print (student.lecturer == get_userid.id)
+        # print (student.courses == course_code and student.lecturer == get_userid.id)
+        if (student.courses == course_code ) and (student.lecturer == get_userid.id) is True:
+            student_list.append(student)
+    
+    if student_list == []:
+        print(student_list == 0)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"YOU DID NOT TEACH >> {course_code} << COURSE")       
+    
+    return {"message": f"{len(student_list)} STUDENTS REGISTERED FOR {course_code} COURSE",
+            "details": student_list
+            }
+    
