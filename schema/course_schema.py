@@ -1,4 +1,4 @@
-from pydantic import EmailStr, BaseModel
+from pydantic import BaseModel
 
 class CourseModel(BaseModel):
     course_name : str
@@ -7,7 +7,7 @@ class CourseModel(BaseModel):
 class GradeModel(BaseModel):
     course_code : str
     student_matric_no : str
-    percent_grade : float = 95.5
+    percent_grade : float = 60.5
     
 class CourseRegister(BaseModel):
     courses : str = "MTH 101"

@@ -57,27 +57,41 @@ class reusables_codes:
     
     @staticmethod
     def get_letter_grade(percent_grade):
-        if percent_grade >= 90:
+        if percent_grade >= 70:
             return 'A'
-        elif percent_grade < 90 and percent_grade >= 80:
+        elif percent_grade >= 60 and percent_grade < 70:
             return 'B'
-        elif percent_grade < 80 and percent_grade >= 70:
+        elif percent_grade >= 50 and percent_grade < 60:
             return 'C'
-        elif percent_grade < 70 and percent_grade >= 60:
+        elif percent_grade >= 45 and percent_grade < 50:
             return 'D'
-        elif percent_grade < 60 and percent_grade >= 50:
+        elif percent_grade >=40 and percent_grade < 45:
             return 'E'
         else:
             return 'F'
         
     def convert_grade_to_gpa(letter_grade):
         if letter_grade == 'A':
-            return 4.0
+            return 5.0
         elif letter_grade == 'B':
-            return 3.3
+            return 4.0
         elif letter_grade == 'C':
-            return 2.3
+            return 3.0
         elif letter_grade == 'D':
-            return 1.3
+            return 2.0
+        elif letter_grade == 'E':
+            return 1.0
         else:
             return 0
+    
+    def convert_cgpa_to_class(cgpa):
+        if cgpa >= 4.5 and cgpa <= 5.0:
+            return "FIRST CLASS"
+        elif cgpa >= 3.5 and cgpa < 4.5:
+            return "SECOND CLASS UPPER" 
+        elif cgpa >= 2.5 and cgpa < 3.5:
+            return "SECOND CLASS LOWER"
+        elif cgpa >= 1.5 and cgpa < 2.5:
+            return "THIRD CLASS"
+        else:
+            return "PASS"

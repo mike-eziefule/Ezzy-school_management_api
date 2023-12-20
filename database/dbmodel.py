@@ -1,5 +1,5 @@
 from database.database import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.orm import relationship
 
 class User(Base):
@@ -56,14 +56,15 @@ class Students(Base):
     owner = relationship("User", back_populates="students")
     stu_grade = relationship("Grading", back_populates= "owner1")
     stu_course = relationship("Student_course", back_populates= "owner_1")
+    stu_finance = relationship("Finances", back_populates= "owner")
 
 class Courses(Base):
     __tablename__ = 'courses'
 
     id = Column(Integer, primary_key=True, index=True, nullable=False)
-    course_name = Column(String(50), nullable= False)
+    course_title = Column(String(50), nullable= False)
     course_code = Column(String(20), nullable=False)
-    lecturer_id = Column(Integer, ForeignKey("lecturers.id"))
+    lecturer = Column(Integer, ForeignKey("lecturers.id"))
     
     #relationship
     owner = relationship("Lecturers", back_populates="courses")
@@ -74,12 +75,12 @@ class Grading(Base):
     __tablename__ = 'grades'
 
     id = Column(Integer, primary_key=True, index=True, nullable=False)
-    lecturer_id = Column(Integer, ForeignKey("lecturers.id"))
-    student_matric_no = Column(String, ForeignKey("students.matric_no"))
-    course_code = Column(String, ForeignKey("courses.course_code"))
-    percent_grade = Column(String(50), nullable= False)
-    letter_grade = Column(String(50), nullable= False)
-    grade_point = Column(String(50), nullable= False)
+    lecturer = Column(Integer, ForeignKey("lecturers.id"), nullable=False)
+    student = Column(String, ForeignKey("students.id"), nullable=False)
+    course = Column(String, ForeignKey("courses.id"), nullable=False)
+    percent_grade = Column(Float, nullable= False)
+    letter_grade = Column(String(2), nullable= False)
+    grade_point = Column(Float, nullable= False)
     
     #relationship
     owner1 = relationship("Students", back_populates="stu_grade")
@@ -90,9 +91,9 @@ class Student_course(Base):
     __tablename__ = 'student_course'
 
     id = Column(Integer, primary_key=True, index=True, nullable=False)
-    student = Column(String(50), ForeignKey("students.matric_no"))
-    courses = Column(String(20), ForeignKey("courses.course_code"))
-    lecturer = Column(Integer, ForeignKey("lecturers.id"))
+    student = Column(Integer, ForeignKey("students.id"), nullable=False)
+    courses = Column(Integer, ForeignKey("courses.id"), nullable=False)
+    lecturer = Column(Integer, ForeignKey("lecturers.id"), nullable=False)
     status = Column(String(50), nullable= False, default="Registered")
     
     #relationship
@@ -100,11 +101,14 @@ class Student_course(Base):
     owner_2 = relationship("Courses", back_populates="cou_course")
     owner_3 = relationship("Lecturers", back_populates="lec_course")
 
-# class Finances(Base):
-#     __tablename__ = 'finances'
+class Finances(Base):
+    __tablename__ = 'finances'
     
-#     id = Column(Integer, unique=True, primary_key=True, index=True)
-#     student_id = Column(Integer, ForeignKey("students.id"))
-#     payment_status= Column(String, nullable= False, default="Unpaid")
-
+    id = Column(Integer, unique=True, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id"))
+    payment_status= Column(String, nullable= False, default="Unpaid")
+    DateTime = Column(DateTime, nullable= False)
+    
+    #relationship
+    owner = relationship("Students", back_populates="stu_finance")
 

@@ -24,6 +24,7 @@ async def register_staff(profile: CreateLect, db:Session=Depends(reusables_codes
     
     #checking if staff is already registered
     get_staff = db.query(Lecturers).filter(user.id == Lecturers.owner_id).first()
+    
     get_staff_all = db.query(Lecturers).all()
     
     if not get_staff:    
@@ -41,8 +42,8 @@ async def register_staff(profile: CreateLect, db:Session=Depends(reusables_codes
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"ALREADY REGISTERED WITH STAFF NUMBER >>> {get_staff.staff_no.upper()} <<<")
 
 #REGISTER NEW COURSE BY COURSE LECTURER
-@lect_app.post('/add_course')
-async def new_course(input: CourseModel, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+@lect_app.post('/create_course')
+async def add_new_course(input: CourseModel, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
@@ -128,48 +129,101 @@ async def grade_students(input: GradeModel, db:Session=Depends(reusables_codes.g
             return new_course
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"STUDENT DID NOT REGISTER FOR THIS COURSE")
 
+
+#VIEW MY COURSES BY LECTURER
+@lect_app.get('/my_courses')
+async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+
+    #authentication
+    user = reusables_codes.get_user_from_token(db, token)
+    
+    #verify logged-in user.
+    get_staff = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
+    if not get_staff:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="ONLY LECTURERS ARE ALLOWED")
+
+    #verify student's matric_no.
+    view_course = db.query(Courses).filter(Courses.lecturer_id == get_staff.id)
+    if not view_course.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="LIST IS EMPTY, KINDLY REGISTER YOUR COURSE")
+    
+    return {
+        "Message": f"Welcome {get_staff.last_name}",
+        "Registered Courses": view_course.all(),
+    }
+
+
 #SEE STUDENTS TAKING A COURSE BY COURSE LECTURER
 @lect_app.get('/my_students')
 async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
-    #get lecturers id of logged in lecturer
+    #get lecturers id of logged-in USER
     get_userid  = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
     if not get_userid:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="YOU ARE NOT A LECTURER!!!")       
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="YOU ARE NOT A LECTURER!")       
 
     #get lecturers id of logged in lecturer
     get_lectid = db.query(Student_course).filter(Student_course.lecturer == get_userid.id)
     if not get_lectid.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="UNREGISTERED OR UNOFFERED COURSE")      
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NO REGISTERED STUDENT FOUND")      
 
     #get lecturers id of logged in lecturer
     check_course = db.query(Student_course).filter(Student_course.courses == course_code).first()
     if not check_course:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="INVALID OR UNOFFERED COURSE")      
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NO REGISTERED STUDENT FOUND")      
 
     #limit lecturer to assigned course
     check_course = db.query(Courses).filter(Courses.lecturer_id == get_userid.id)
     
     if not check_course.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="INVALID OR UNOFFERED COURSE")      
-
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COURSE NOT FOUND, KINDLY ADD YOUR COURSE")      
 
     student_list = []
     #Iterate through list to match students with lecturers course
     for student in get_lectid.all():
-        # print (student.courses == student.courses)
-        # print (student.lecturer == get_userid.id)
-        # print (student.courses == course_code and student.lecturer == get_userid.id)
+
         if (student.courses == course_code ) and (student.lecturer == get_userid.id) is True:
-            student_list.append(student)
-    
+            student_list.append([student.student, student.courses, student.status])
+
     if student_list == []:
         print(student_list == 0)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"YOU DID NOT TEACH >> {course_code} << COURSE")       
+
+    return {
+        "message": f"{len(student_list)} STUDENTS REGISTERED FOR {course_code} COURSE",
+        "details": student_list
+    }
     
-    return {"message": f"{len(student_list)} STUDENTS REGISTERED FOR {course_code} COURSE",
-            "details": student_list
-            }
+#EDIT COURSE BY LECTURER
+@lect_app.put('/edit_course_detail')
+async def edit_courses(course_id:int, input:CourseModel, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+
+    #authentication
+    user = reusables_codes.get_user_from_token(db, token)
     
+    #verify logged-in user.
+    get_staff = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
+    if not get_staff:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="ONLY LECTURERS ARE ALLOWED")
+
+    modify_course = db.query(Courses).filter(Courses.id == course_id)
+    if not modify_course.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="NOT FOUND, KINDLY ADD COURSE"
+        )
+
+    if modify_course.first().lecturer_id != get_staff.id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='ONLY COURSE OWNER CAN MODIFY'
+        )
+    
+    modify_course.update(input.model_dump())
+    db.commit()
+    raise HTTPException(
+        status_code=status.HTTP_202_ACCEPTED,
+        detail='Course Information updated successfully'
+    )

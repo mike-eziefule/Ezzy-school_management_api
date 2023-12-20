@@ -19,10 +19,16 @@ async def signup(input:CreateUser, db:Session=Depends(reusables_codes.get_db)):
     if input.password != input.retype_password:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="PASSWORD MISMATCH!!!")
     
+    user_role = input.user_type.lower()
+    print(user_role)
+    
+    if user_role != "staff" and user_role != "student" and user_role != "admin":
+        return "THE ENTERED USER TYPE IS UNSUPPORTED"
+    
     new_user = User(
         email = input.email, 
         password = input.password, 
-        user_type = input.user_type
+        user_type = user_role
     )
     
     db.add(new_user)

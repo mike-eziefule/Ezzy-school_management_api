@@ -6,10 +6,6 @@ class Auth(BaseModel):
     email : EmailStr
     password : str
     
-# class Credentials(Auth):
-#     retype_password : str
-#     user_type: str = "admin/staff/student"
-    
 class Base(BaseModel):
     first_name: str
     last_name: str
