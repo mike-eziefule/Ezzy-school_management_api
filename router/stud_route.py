@@ -39,7 +39,7 @@ async def register_student(profile: CreateStudent, db:Session=Depends(reusables_
 
 #REGISTER FOR A COURSE BY STUDENT
 @stud_app.post('/course_registration')
-async def new_course(input: CourseRegister, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+async def register_course(input: CourseRegister, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
@@ -49,8 +49,8 @@ async def new_course(input: CourseRegister, db:Session=Depends(reusables_codes.g
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"ACCESS_DENIED!!! ONLY STUDENTS CAN REGISTER FOR A COURSE")
     
     #finding course Lecturer
-    get_lect = db.query(Courses).filter(Courses.course_code == input.courses).first()
-    if not get_lect:
+    get_course = db.query(Courses).filter(Courses.course_code == input.courses).first()
+    if not get_course:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"COURSE DOES NOT EXIST YET, TRY LATER.")
     
     #finding students matric_no.
@@ -58,28 +58,28 @@ async def new_course(input: CourseRegister, db:Session=Depends(reusables_codes.g
     if not get_student:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"STUDENT DATA NOT FOUND, KINDLY REGISTER.")
     
+    
     #checking if course is already registered by authenticated student
     find_course= db.query(Student_course).all()
     for row in find_course:
-        if row.student == get_student.id:
-            if row.courses == input.courses:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"COURSE ALREADY REGISTERED AS >>> {input.courses.upper()} : {get_lect.course_name.upper()} <<<")
+        if (row.student == get_student.id) and (row.courses == get_course.id) is True:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"COURSE ALREADY REGISTERED AS >>> {input.courses.upper()} : {get_course.course_title.upper()} <<<")
     
     #saving if not previously registered.
     new_student = Student_course(
-        **input.model_dump(), 
+        courses = get_course.id,
         student = get_student.id,
-        lecturer = get_lect.lecturer_id,
+        lecturer = get_course.lecturer,
         status = "Registered"
     )
     db.add(new_student)
     db.commit()
     db.refresh(new_student)
-    return f"COURSE >> {input.courses} : {get_lect.course_name} << SUCCESSFULLY REGISTERED"
+    return f"COURSE >> {input.courses} : {get_course.course_title} << SUCCESSFULLY REGISTERED"
     
     
 #VIEW REGISTERED COURSES BY STUDENT
-@stud_app.get('/my_courses')
+@stud_app.get('/offered_courses')
 async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -99,8 +99,8 @@ async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depen
     }
     
 #VIEW COURSE DETAIL BY STUDENT
-@stud_app.get('/course_detail')
-async def check_course_detail(course_code: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+@stud_app.get('/course_info')
+async def course_information(course_code: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
@@ -126,7 +126,7 @@ async def check_lecturer_id(lecturer_id: int, db:Session=Depends(reusables_codes
     get_lecturer = db.query(Lecturers).filter(Lecturers.id == lecturer_id)
     
     if not get_lecturer.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="INVALID LECTURER ID")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="NO RECORD OR INVALID LECTURER ID ENTERED")
     
     return {
         "Courses Lecturer": get_lecturer.first()
@@ -194,14 +194,14 @@ async def my_cgpa(db:Session=Depends(reusables_codes.get_db), token:str=Depends(
     my_class =reusables_codes.convert_cgpa_to_class(my_cgpa)
     
     return {
-        "message": f"Welcome {get_userid.last_name}", 
+        "message": f"Welcome {get_userid.first_name}", 
         "CGPA" : (my_cgpa),
         "class": my_class
     }
 
 #DELETE A REGISTERED COURSE BY STUDENT
-@stud_app.delete('/delete_my_course')
-async def delete_my_courses(course_id: str, password: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+@stud_app.delete('/delete_registered_course')
+async def delete_my_courses(course_id: int, password: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
@@ -210,20 +210,34 @@ async def delete_my_courses(course_id: str, password: str, db:Session=Depends(re
     if password != user.password:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail= "PASSWORD IS INCORRECT")
     
-    #verify student's matric_no.
+    #verify student.
     get_student = db.query(Students).filter(Students.owner_id == user.id).first()
     
-    #verify student's matric_no.
+    if not get_student:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail= "NON STUDENT DETECTED, PLEASE SIGN IN AS A STUDENT"
+        )
+    
+    #verify and delete course.
     view_course = db.query(Student_course).filter(Student_course.student == get_student.id)
     
+    if not view_course.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail= "NO REGISTERED COURSE FOUND"
+        )
+        
     for data in view_course.all():
-        if (data.courses == course_id) and (data.student == get_student.id) is True:
+        if (data.courses == course_id) is True:
+            
             db.delete(data)
             db.commit()
             raise HTTPException(
                 status_code=status.HTTP_202_ACCEPTED, 
                 detail= f"COURSE {data.courses} DELETED SUCCESSFULLY"
             )
+
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, 
         detail= "COURSE NOT PREVIOUSLY REGISTERED"
