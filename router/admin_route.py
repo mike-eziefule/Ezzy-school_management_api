@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schema.user_schema import CreateAdmin, EditUser, ShowUser
+from schema.user_schema import CreateAdmin, showAdmin
 from sqlalchemy.orm import Session
 from service.utils import reusables_codes
 from database.dbmodel import Admin
@@ -10,7 +10,7 @@ from router.auth_route import oauth2_scheme
 adm_app = APIRouter()
 
 #STAFF REGISTRATION ROUTE
-@adm_app.post('/register')  #response_model = ShowUser
+@adm_app.post('/register',response_model=showAdmin, status_code= 201)  #
 
 async def register_admin(profile: CreateAdmin, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 

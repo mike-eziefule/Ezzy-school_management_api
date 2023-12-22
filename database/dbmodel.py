@@ -76,8 +76,8 @@ class Grading(Base):
 
     id = Column(Integer, primary_key=True, index=True, nullable=False)
     lecturer = Column(Integer, ForeignKey("lecturers.id"), nullable=False)
-    student = Column(String, ForeignKey("students.id"), nullable=False)
-    course = Column(String, ForeignKey("courses.id"), nullable=False)
+    student = Column(Integer, ForeignKey("students.id"), nullable=False)
+    course = Column(Integer, ForeignKey("courses.id"), nullable=False)
     percent_grade = Column(Float, nullable= False)
     letter_grade = Column(String(2), nullable= False)
     grade_point = Column(Float, nullable= False)

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schema.user_schema import CreateUser
+from schema.user_schema import UserSignup, showUserSignup
 from sqlalchemy.orm import Session
 from service.utils import reusables_codes
 from database.dbmodel import User
@@ -7,9 +7,9 @@ from database.dbmodel import User
 #access the fastapi attributes
 user_app = APIRouter()
 
-#CREATE PROFILE ROUTE
-@user_app.post('/signup')
-async def signup(input:CreateUser, db:Session=Depends(reusables_codes.get_db)):
+#SIGNUP ROUTE
+@user_app.post('/signup', response_model=showUserSignup, status_code=201)
+async def signup(input:UserSignup, db:Session=Depends(reusables_codes.get_db)):
 
     #checking if user is already registered
     get_users = db.query(User).filter(User.email == input.email)

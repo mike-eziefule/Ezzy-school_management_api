@@ -1,44 +1,64 @@
 from pydantic import EmailStr, BaseModel
 from datetime import date
 
-
-class Auth(BaseModel):
+class User(BaseModel):
     email : EmailStr
     password : str
     
-class Base(BaseModel):
-    first_name: str
-    last_name: str
-    gender: str = "M/F"
-
-class CreateUser(Auth):
+#signup user schema
+class UserSignup(User):
     retype_password : str
-    user_type: str = "admin/staff/student"
-    
-class CreateStudent(Base):
-    dob: date
-    origin: str
+    user_type: str = "input: admin or staff or student"
 
-class CreateAdmin(BaseModel):
-    username: str
-    designation: str
-
-class CreateLect(Base):
-    pass
-
-class EditUser(BaseModel):
-    firstname: str
-    lastname: str
-    
-class ShowUser(CreateUser):
+#displayable in signup user schema
+class showUserSignup(BaseModel):
     id : int
+    email : EmailStr
+    user_type: str    
     class Config:
         orm_mode = True
 
-class ShowCourses(BaseModel):
-    student : str
-    courses: str
-    lecturer : list[str] = []
-    status: str
+
+class BaseUser(BaseModel):
+    first_name: str
+    last_name: str
+    gender: str = "male"
+
+
+#create user profile schema
+class CreateStudent(BaseUser):
+    dob: date
+    origin: str
+    
+#displayable in create student profile schema
+class showCreateStudent(CreateStudent):
+    matric_no: str
+    owner : showUserSignup
+    class Config:
+        orm_mode = True
+
+
+#create admin profile schema
+class CreateAdmin(BaseModel):
+    username: str
+    designation: str
+    
+#displayable in create admin profile schema
+class showAdmin(CreateAdmin):
+    id: str
+    public_id: str
+    owner : showUserSignup
+    class Config:
+        orm_mode = True
+
+
+#create staff profile schema
+class CreateLect(BaseUser):
+    pass
+
+#displayable in create staff profile schema
+class showCreateLect(CreateLect):
+    staff_no: str
+    owner : showUserSignup
     class Config:
         orm_mode = True

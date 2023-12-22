@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schema.user_schema import CreateLect, EditUser, ShowUser
-from schema.course_schema import CourseModel, GradeModel
+from schema.user_schema import CreateLect, showCreateLect
+from schema.course_schema import newCourse, showNewCourse, GradeModel, showGradeModel
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 from service.utils import reusables_codes
 from database.dbmodel import Lecturers, Courses, Grading, Students, Student_course
 from router.auth_route import oauth2_scheme
@@ -12,7 +11,7 @@ from router.auth_route import oauth2_scheme
 lect_app = APIRouter()
 
 #STAFF REGISTRATION ROUTE
-@lect_app.post('/register', status_code=201)  #response_model = ShowUser
+@lect_app.post('/register', response_model=showCreateLect, status_code=201)
 async def register_staff(profile: CreateLect, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -42,8 +41,8 @@ async def register_staff(profile: CreateLect, db:Session=Depends(reusables_codes
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"ALREADY REGISTERED WITH STAFF NUMBER >>> {get_staff.staff_no.upper()} <<<")
 
 #REGISTER NEW COURSE BY COURSE LECTURER
-@lect_app.post('/create_course', status_code=201)
-async def add_new_course(input: CourseModel, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+@lect_app.post('/create_course', response_model=showNewCourse, status_code=201)
+async def add_new_course(input: newCourse, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
@@ -69,10 +68,7 @@ async def add_new_course(input: CourseModel, db:Session=Depends(reusables_codes.
         db.add(new_course)
         db.commit()
         db.refresh(new_course)
-        return {
-            "Message": "Registration Successful",
-            "Details": new_course
-        }
+        return new_course
     
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED, 
@@ -80,7 +76,7 @@ async def add_new_course(input: CourseModel, db:Session=Depends(reusables_codes.
 
 
 #GRADE A STUDENT BY COURSE LECTURER
-@lect_app.post('/grade_students')
+@lect_app.post('/grade_students', response_model=showGradeModel, status_code=202)
 async def grade_students(input:GradeModel, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -107,7 +103,7 @@ async def grade_students(input:GradeModel, db:Session=Depends(reusables_codes.ge
     if get_course.lecturer != get_lecturer.id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"ACCESS_DENIED!!! YOU ARE NOT THE COURSE LECTURER")
     
-#checking if course is already graded by authenticated lecturer
+    #checking if course is already graded by authenticated lecturer
     get_student_grade = db.query(Grading).filter(Grading.student == get_student.id, Grading.course == get_course.id)
     for row in get_student_grade:
         if get_student_grade:
@@ -140,7 +136,7 @@ async def grade_students(input:GradeModel, db:Session=Depends(reusables_codes.ge
 
 
 #VIEW MY COURSES BY LECTURER
-@lect_app.get('/my_courses')
+@lect_app.get('/my_courses', response_model= list[newCourse], status_code= 202)
 async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -154,16 +150,13 @@ async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depen
     #verify student's matric_no.
     view_course = db.query(Courses).filter(Courses.lecturer == get_staff.id)
     if not view_course.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="LIST IS EMPTY, KINDLY REGISTER YOUR COURSE")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="LIST IS EMPTY, KINDLY REGISTER A COURSE")
     
-    return {
-        "Message": f"Welcome {get_staff.last_name}",
-        "Registered Courses": view_course.all(),
-    }
+    return  view_course.all()
 
 
 #SEE STUDENTS TAKING A COURSE BY COURSE LECTURER
-@lect_app.get('/my_students')
+@lect_app.get('/my_students', status_code=202)
 async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -191,8 +184,8 @@ async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_d
     
     
 #EDIT COURSE BY LECTURER
-@lect_app.put('/edit_course_detail')
-async def edit_courses(course_id:int, input:CourseModel, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+@lect_app.put('/edit_course_detail', status_code=202)
+async def edit_courses(course_id:int, input:newCourse, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)

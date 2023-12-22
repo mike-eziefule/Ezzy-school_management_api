@@ -1,16 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schema.user_schema import CreateStudent, EditUser, ShowUser, ShowCourses
-from schema.course_schema import CourseRegister
+from schema.user_schema import CreateStudent, showCreateStudent, showCreateLect
+from schema.course_schema import registerCourse, showregisterCourse, showNewCourse, showGradeModel
 from sqlalchemy.orm import Session
 from service.utils import reusables_codes
 from database.dbmodel import Students, Courses, Student_course, Grading, Lecturers
 from router.auth_route import oauth2_scheme
+from typing import Any
+
 
 #access the fastapi attributes
 stud_app = APIRouter()
 
-#STUDENT REGISTRATION ROUTE
-@stud_app.post('/register')  #response_model = ShowUser
+#STUDENT REGISTRATION/CREATE PROFILE ROUTE
+@stud_app.post('/register', response_model = showCreateStudent, status_code=201)  
 async def register_student(profile: CreateStudent, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -26,7 +28,8 @@ async def register_student(profile: CreateStudent, db:Session=Depends(reusables_
         new_student = Students(
             **profile.model_dump(), 
             matric_no = reusables_codes.gen_matric_no(len(get_all_student) + 1), 
-            owner_id = user.id)
+            owner_id = user.id
+        )
         
         db.add(new_student)
         db.commit()
@@ -38,8 +41,8 @@ async def register_student(profile: CreateStudent, db:Session=Depends(reusables_
 
 
 #REGISTER FOR A COURSE BY STUDENT
-@stud_app.post('/course_registration')
-async def register_course(input: CourseRegister, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+@stud_app.post('/course_registration', response_model=showregisterCourse, status_code= 201)
+async def register_course(input: registerCourse, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)) -> Any:
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
@@ -67,19 +70,19 @@ async def register_course(input: CourseRegister, db:Session=Depends(reusables_co
     
     #saving if not previously registered.
     new_student = Student_course(
-        courses = get_course.id,
         student = get_student.id,
+        courses = get_course.id,
         lecturer = get_course.lecturer,
         status = "Registered"
     )
     db.add(new_student)
     db.commit()
     db.refresh(new_student)
-    return f"COURSE >> {input.courses} : {get_course.course_title} << SUCCESSFULLY REGISTERED"
+    return new_student
     
     
 #VIEW REGISTERED COURSES BY STUDENT
-@stud_app.get('/offered_courses')
+@stud_app.get('/offered_courses', response_model=list[showregisterCourse], status_code= 202)
 async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -93,13 +96,10 @@ async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depen
     if not view_course.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="COURSE LIST IS EMPTY")
     
-    return {
-        "Message": f"Welcome {get_student.last_name}",
-        "Registered Courses": view_course.all(),
-    }
+    return view_course.all()
     
 #VIEW COURSE DETAIL BY STUDENT
-@stud_app.get('/course_info')
+@stud_app.get('/course_info', response_model= showNewCourse, status_code=202)
 async def course_information(course_code: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -111,12 +111,10 @@ async def course_information(course_code: str, db:Session=Depends(reusables_code
     if not get_code.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="INVALID INPUT or COURSE NOT YET CREATED")
     
-    return {
-        "Courses Lecturer": get_code.first()
-    }
+    return get_code.first()
     
 #VIEW LECTURERS DETAIL BY STUDENT
-@stud_app.get('/my_lecturer_id')
+@stud_app.get('/my_lecturer_id', response_model= showCreateLect, status_code=202)
 async def check_lecturer_id(lecturer_id: int, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -128,12 +126,10 @@ async def check_lecturer_id(lecturer_id: int, db:Session=Depends(reusables_codes
     if not get_lecturer.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="NO RECORD OR INVALID LECTURER ID ENTERED")
     
-    return {
-        "Courses Lecturer": get_lecturer.first()
-    }
+    return get_lecturer.first()
     
 #VIEW GRADE OF COURSES TAKEN BY STUDENT
-@stud_app.get('/results')
+@stud_app.get('/results', response_model=list[showGradeModel], status_code=202)
 async def my_results(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -148,13 +144,10 @@ async def my_results(db:Session=Depends(reusables_codes.get_db), token:str=Depen
     if not get_studentid.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NO RESULTS FOUND, TRY AGAIN LATER")    
     
-    return {
-        "message": f"Welcome {get_userid.last_name}", 
-        "Result" : get_studentid.all()
-    }
+    return get_studentid.all()
     
 #VIEW CGPA BY STUDENT
-@stud_app.get('/cgpa')
+@stud_app.get('/cgpa', status_code=202)
 async def my_cgpa(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -186,7 +179,7 @@ async def my_cgpa(db:Session=Depends(reusables_codes.get_db), token:str=Depends(
         raise HTTPException(status_code=status.HTTP_206_PARTIAL_CONTENT, detail="GRADING IS ONGOING, TRY LATER")    
     
     my_cgpa = 0
-        
+    
     for results in get_result.all():
         my_cgpa = my_cgpa + results.grade_point
     
@@ -200,7 +193,7 @@ async def my_cgpa(db:Session=Depends(reusables_codes.get_db), token:str=Depends(
     }
 
 #DELETE A REGISTERED COURSE BY STUDENT
-@stud_app.delete('/delete_registered_course')
+@stud_app.delete('/delete_registered_course', status_code=202)
 async def delete_my_courses(course_id: int, password: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
