@@ -34,4 +34,10 @@ class showregisterCourse(BaseModel):
     status: str
     class Config:
         orm_mode = True
+        
+class showregisterStudents(BaseModel):
+    owner_1 : showCreateStudent
+    status: str
+    class Config:
+        orm_mode = True
 

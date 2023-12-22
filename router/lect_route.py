@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from schema.user_schema import CreateLect, showCreateLect
-from schema.course_schema import newCourse, showNewCourse, GradeModel, showGradeModel
+from schema.course_schema import newCourse, showNewCourse, GradeModel, showGradeModel, showregisterStudents
 from sqlalchemy.orm import Session
 from service.utils import reusables_codes
 from database.dbmodel import Lecturers, Courses, Grading, Students, Student_course
@@ -156,7 +156,7 @@ async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depen
 
 
 #SEE STUDENTS TAKING A COURSE BY COURSE LECTURER
-@lect_app.get('/my_students', status_code=202)
+@lect_app.get('/my_students', response_model= list[showregisterStudents], status_code=202)
 async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -177,14 +177,16 @@ async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_d
     if not get_lectid.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"NO STUDENT RECORD FOUND FOR {check_course_code.course_title}")      
 
-    return {
-        "message": f"{len(get_lectid.all())} STUDENTS REGISTERED FOR {course_code} COURSE",
-        "details": get_lectid.all()
-    }
+    return get_lectid.all()
+
+    # return {
+    #     "message": f"{len(get_lectid.all())} STUDENTS REGISTERED FOR {course_code} COURSE",
+    #     "details": get_lectid.all()
+    # }
     
     
 #EDIT COURSE BY LECTURER
-@lect_app.put('/edit_course_detail', status_code=202)
+@lect_app.put('/edit_course_detail', response_model=list[showregisterStudents], status_code=202)
 async def edit_courses(course_id:int, input:newCourse, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
