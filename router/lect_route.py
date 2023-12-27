@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from schema.user_schema import CreateLect, showCreateLect
-from schema.course_schema import newCourse, showNewCourse, GradeModel, showGradeModel, showregisterStudents
+from schema.course_schema import newCourse, showNewCourse, GradeModel, showregisterStudents,showResultModel
 from sqlalchemy.orm import Session
 from service.utils import reusables_codes
 from database.dbmodel import Lecturers, Courses, Grading, Students, Student_course
@@ -76,7 +76,7 @@ async def add_new_course(input: newCourse, db:Session=Depends(reusables_codes.ge
 
 
 #GRADE A STUDENT BY COURSE LECTURER
-@lect_app.post('/grade_students', response_model=showGradeModel, status_code=202)
+@lect_app.post('/grade_students', response_model=showResultModel, status_code=202)
 async def grade_students(input:GradeModel, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
@@ -170,8 +170,7 @@ async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_d
     check_course_code = db.query(Courses).filter(Courses.course_code == course_code).first()
     if not check_course_code:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COURSE CODE IS INCORRECT OR UNPUBLISHED, TRY AGAIN")      
-
-
+    
     #get id of logged in lecturer
     get_lectid = db.query(Student_course).filter(Student_course.lecturer == get_userid.id, Student_course.courses == check_course_code.id)
     if not get_lectid.first():
@@ -179,15 +178,34 @@ async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_d
 
     return get_lectid.all()
 
-    # return {
-    #     "message": f"{len(get_lectid.all())} STUDENTS REGISTERED FOR {course_code} COURSE",
-    #     "details": get_lectid.all()
-    # }
+
+#VIEW MY STUDENT RESULT AND GRADE B LECTURER
+@lect_app.get('/student_result', response_model=list[showResultModel], status_code=202)
+async def my_student_result(course_code:str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+
+    #authentication
+    user = reusables_codes.get_user_from_token(db, token)
     
+    #verify logged-in user and retreive staff id.
+    get_staff = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
+    if not get_staff:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="ONLY LECTURERS ARE ALLOWED")
+
+    #CONVERT course code to course id
+    check_course_code = db.query(Courses).filter(Courses.course_code == course_code).first()
+    if not check_course_code:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COURSE CODE IS INCORRECT OR UNPUBLISHED, TRY AGAIN")      
+
+    #get student record by filtering course id and lecturer id
+    results = db.query(Grading).filter(Grading.course == check_course_code.id, Grading.lecturer == get_staff.id)
+    if not results.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NO RESULTS FOUND, TRY AGAIN LATER")    
     
+    return results.all()
+
 #EDIT COURSE BY LECTURER
 @lect_app.put('/edit_course_detail', response_model=list[showregisterStudents], status_code=202)
-async def edit_courses(course_id:int, input:newCourse, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+async def edit_my_course(course_id:int, input:newCourse, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
@@ -216,3 +234,5 @@ async def edit_courses(course_id:int, input:newCourse, db:Session=Depends(reusab
         status_code=status.HTTP_202_ACCEPTED,
         detail='Course Information updated successfully'
     )
+    
+

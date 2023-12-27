@@ -36,9 +36,9 @@ class Lecturers(Base):
     
     #relationship
     owner = relationship("User", back_populates="lecturers")
-    courses = relationship("Courses", back_populates= "owner")
-    lec_grade = relationship("Grading", back_populates= "owner3")
-    lec_course = relationship("Student_course", back_populates= "owner_3")
+    courses = relationship("Courses", back_populates= "lecturer_info")
+    lec_grade = relationship("Grading", back_populates= "lecturer_info")
+    lec_course = relationship("Student_course", back_populates= "lecturer_info")
 
 class Students(Base):
     __tablename__ = 'students'
@@ -54,8 +54,8 @@ class Students(Base):
     
     #relationship
     owner = relationship("User", back_populates="students")
-    stu_grade = relationship("Grading", back_populates= "owner1")
-    stu_course = relationship("Student_course", back_populates= "owner_1")
+    stu_grade = relationship("Grading", back_populates= "student_info")
+    stu_course = relationship("Student_course", back_populates= "student_info")
     stu_finance = relationship("Finances", back_populates= "owner")
 
 class Courses(Base):
@@ -67,9 +67,9 @@ class Courses(Base):
     lecturer = Column(Integer, ForeignKey("lecturers.id"))
     
     #relationship
-    owner = relationship("Lecturers", back_populates="courses")
-    cou_grade = relationship("Grading", back_populates= "owner2")
-    cou_course = relationship("Student_course", back_populates= "owner_2")
+    lecturer_info = relationship("Lecturers", back_populates="courses")
+    cou_grade = relationship("Grading", back_populates= "course_info")
+    cou_course = relationship("Student_course", back_populates= "course_info")
     
 class Grading(Base):
     __tablename__ = 'grades'
@@ -83,9 +83,9 @@ class Grading(Base):
     grade_point = Column(Float, nullable= False)
     
     #relationship
-    owner1 = relationship("Students", back_populates="stu_grade")
-    owner2 = relationship("Courses", back_populates="cou_grade")
-    owner3 = relationship("Lecturers", back_populates="lec_grade")
+    student_info = relationship("Students", back_populates="stu_grade")
+    course_info = relationship("Courses", back_populates="cou_grade")
+    lecturer_info = relationship("Lecturers", back_populates="lec_grade")
 
 class Student_course(Base):
     __tablename__ = 'student_course'
@@ -97,9 +97,9 @@ class Student_course(Base):
     status = Column(String(50), nullable= False, default="Registered")
     
     #relationship
-    owner_1 = relationship("Students", back_populates="stu_course")
-    owner_2 = relationship("Courses", back_populates="cou_course")
-    owner_3 = relationship("Lecturers", back_populates="lec_course")
+    student_info = relationship("Students", back_populates="stu_course")
+    course_info = relationship("Courses", back_populates="cou_course")
+    lecturer_info = relationship("Lecturers", back_populates="lec_course")
 
 class Finances(Base):
     __tablename__ = 'finances'

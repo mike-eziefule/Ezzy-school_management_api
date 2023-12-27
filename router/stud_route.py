@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schema.user_schema import CreateStudent, showCreateStudent, showCreateLect
+from schema.user_schema import CreateStudent, showCreateStudent
 from schema.course_schema import registerCourse, showregisterCourse, showNewCourse, showGradeModel
 from sqlalchemy.orm import Session
 from service.utils import reusables_codes
-from database.dbmodel import Students, Courses, Student_course, Grading, Lecturers
+from database.dbmodel import Students, Courses, Student_course, Grading
 from router.auth_route import oauth2_scheme
 from typing import Any
 
@@ -98,6 +98,7 @@ async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depen
     
     return view_course.all()
     
+    
 #VIEW COURSE DETAIL BY STUDENT
 @stud_app.get('/course_info', response_model= showNewCourse, status_code=202)
 async def course_information(course_code: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
@@ -113,21 +114,7 @@ async def course_information(course_code: str, db:Session=Depends(reusables_code
     
     return get_code.first()
     
-#VIEW LECTURERS DETAIL BY STUDENT
-@stud_app.get('/my_lecturer_id', response_model= showCreateLect, status_code=202)
-async def check_lecturer_id(lecturer_id: int, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
-    #authentication
-    user = reusables_codes.get_user_from_token(db, token)
-    
-    #verify lecturers' id.
-    get_lecturer = db.query(Lecturers).filter(Lecturers.id == lecturer_id)
-    
-    if not get_lecturer.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="NO RECORD OR INVALID LECTURER ID ENTERED")
-    
-    return get_lecturer.first()
-    
 #VIEW GRADE OF COURSES TAKEN BY STUDENT
 @stud_app.get('/results', response_model=list[showGradeModel], status_code=202)
 async def my_results(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
@@ -145,6 +132,7 @@ async def my_results(db:Session=Depends(reusables_codes.get_db), token:str=Depen
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NO RESULTS FOUND, TRY AGAIN LATER")    
     
     return get_studentid.all()
+    
     
 #VIEW CGPA BY STUDENT
 @stud_app.get('/cgpa', status_code=202)
@@ -165,7 +153,6 @@ async def my_cgpa(db:Session=Depends(reusables_codes.get_db), token:str=Depends(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NO RESULTS FOUND, TRY AGAIN LATER")    
     
     registered_c_length = len(offered_courses.all())
-    print(registered_c_length)
     
     #get number of results published
     get_result = db.query(Grading).filter(Grading.student == get_userid.id)
@@ -173,7 +160,6 @@ async def my_cgpa(db:Session=Depends(reusables_codes.get_db), token:str=Depends(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NO RESULTS FOUND, TRY AGAIN LATER")    
     
     graded_c_length = len(get_result.all())
-    print(graded_c_length)
     
     if graded_c_length < registered_c_length:
         raise HTTPException(status_code=status.HTTP_206_PARTIAL_CONTENT, detail="GRADING IS ONGOING, TRY LATER")    
@@ -191,6 +177,7 @@ async def my_cgpa(db:Session=Depends(reusables_codes.get_db), token:str=Depends(
         "CGPA" : (my_cgpa),
         "class": my_class
     }
+
 
 #DELETE A REGISTERED COURSE BY STUDENT
 @stud_app.delete('/delete_registered_course', status_code=202)

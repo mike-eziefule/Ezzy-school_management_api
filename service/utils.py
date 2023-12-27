@@ -56,7 +56,13 @@ class reusables_codes:
         return staff_no
     
     @staticmethod
-    def get_letter_grade(percent_grade):
+    def gen_admin_id(id):
+        
+        staff_no = ''.join(f"{setting.admin_initials}{500+id}")
+        return staff_no
+    
+    @staticmethod
+    def get_letter_grade(percent_grade: float):
         if percent_grade >= 70:
             return 'A'
         elif percent_grade >= 60 and percent_grade < 70:
@@ -70,7 +76,7 @@ class reusables_codes:
         else:
             return 'F'
         
-    def convert_grade_to_gpa(letter_grade):
+    def convert_grade_to_gpa(letter_grade:str):
         if letter_grade == 'A':
             return 5.0
         elif letter_grade == 'B':

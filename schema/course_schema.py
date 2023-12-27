@@ -7,7 +7,7 @@ class newCourse(BaseModel):
 
 #displayable in new course register schema
 class showNewCourse(newCourse):
-    owner: showCreateLect
+    lecturer_info: showCreateLect
     class Config:
         orm_mode : True
     
@@ -17,26 +17,32 @@ class GradeModel(BaseModel):
     percent_grade : float = 65.0
 
 class showGradeModel(BaseModel):
-    owner2 : showNewCourse
+    course_info : showNewCourse
     percent_grade:float
     letter_grade: str
     grade_point: float
     class Config:
         orm_mode : True
 
+class showResultModel(BaseModel):
+    student_info : showCreateStudent
+    percent_grade:float
+    letter_grade: str
+    grade_point: float
+    class Config:
+        orm_mode : True
 
 class registerCourse(BaseModel):
     courses : str = "MTH 101"
 
 class showregisterCourse(BaseModel):
-    # owner_1 : showCreateStudent
-    owner_2: showNewCourse
+    course_info: showNewCourse
     status: str
     class Config:
         orm_mode = True
         
 class showregisterStudents(BaseModel):
-    owner_1 : showCreateStudent
+    student_info : showCreateStudent
     status: str
     class Config:
         orm_mode = True

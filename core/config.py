@@ -18,16 +18,10 @@ class Settings:
         'Location': 'Abuja, Nigeria'
     }
     DESCRIPTION = """### PROJECT OVERVIEW 
-#### Welcome to my School Management Api.
+#### Welcome to my School Management API.
 
-* The fundamental concept is that anyone visiting the blog should be able to:
-    * create an account, login and log out at will,
-    * read blog posts written by them and/or other user,
-    * create, edit and delete blog entries created by them but restricted from modifying or deleting posts from others users.
-    * perform authentication where a user credentials is verified before they login.
-    * perform authorization where a user cannot alter the intellectual property of others.
-    * save registration details and blog posts created at all times.
-    <a href="https://github.com/mike-eziefule/Ezzy_Blog_api/blob/main/README.md" target="_blank">Read more</a>*
+* This is a school management API that helps education administrators manage all academic records and activities within their institution.
+* The app caters for three set of users; the administrator, the staff and the students. <a href="https://github.com/mike-eziefule/Ezzy_Blog_api/blob/main/README.md" target="_blank">Read more</a>
 
 
 ##### Created in December 2023 for Altschool Africa
@@ -62,6 +56,7 @@ class Settings:
     Academic_year = os.getenv("Academic_year")
     faculty_code = os.getenv("faculty_code")
     staff_initials = os.getenv("Staff_code")
+    admin_initials = os.getenv("admin_code")
     matric_no = f"{School_code}{Academic_year}/{faculty_code}/"
 
 setting = Settings()
