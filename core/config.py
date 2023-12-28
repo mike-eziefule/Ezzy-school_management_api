@@ -21,7 +21,7 @@ class Settings:
 #### Welcome to my School Management API.
 
 * This is a school management API that helps education administrators manage all academic records and activities within their institution.
-* The app caters for three set of users; the administrator, the staff and the students. <a href="https://github.com/mike-eziefule/Ezzy_Blog_api/blob/main/README.md" target="_blank">Read more</a>
+* The app caters for three set of users; the administrator, the staff and the students. <a href="https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/README.md" target="_blank">Read more</a>
 
 
 ##### Created in December 2023 for Altschool Africa

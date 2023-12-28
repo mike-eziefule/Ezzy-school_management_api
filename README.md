@@ -16,7 +16,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/mike-eziefule/Ezzy-school_management_api">
-    <img src="./images/EZZY-BLOG (1).png" alt="Logo" width="80%" height="20%">
+    <img src="./images/ezzy school.png" alt="Logo" width="80%" height="20%">
   </a>
 </div>
 
@@ -201,8 +201,10 @@ Python3: [Get Python](https://www.python.org/downloads/)
 
 <br />
 
-[![Ezzy blog screenshot pg1][Ezzy-blog-screenshot-pg1]](https://github.com/mike-eziefule/Ezzy_Blog_api/blob/main/images/ezzy_blogpage1.png)
-[![Ezzy blog screenshot pg2][Ezzy-blog-screenshot-pg2]](https://github.com/mike-eziefule/Ezzy_Blog_api/blob/main/images/ezzy_blogpage2.png)
+[![Ezzy school screenshot pg1][Ezzy-school-screenshot-pg1]](https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/images/ezzyschool1.png)
+[![Ezzy school screenshot pg2][Ezzy-school-screenshot-pg2]](https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/images/ezzyschool2.png)
+[![Ezzy school screenshot pg2][Ezzy-school-screenshot-pg3]](https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/images/ezzyschool3.png)
+[![Ezzy school screenshot pg2][Ezzy-school-screenshot-pg4]](https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/images/ezzyschool4.png)
 
 <br/>
 
@@ -261,8 +263,10 @@ This project was made possible by:
 [license-url]: https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/LICENSE
 [twitter-shield]: https://img.shields.io/twitter/follow/EziefuleMichael
 [twitter-url]: https://twitter.com/EziefuleMichael
-[Ezzy-blog-screenshot-pg1]:images/ezzy_blogpage1.png
-[Ezzy-blog-screenshot-pg2]:images/ezzy_blogpage2.png
+[Ezzy-school-screenshot-pg1]:images/ezzyschool1.png
+[Ezzy-school-screenshot-pg1]:images/ezzyschool2.png
+[Ezzy-school-screenshot-pg1]:images/ezzyschool3.png
+[Ezzy-school-screenshot-pg1]:images/ezzyschool.png
 [python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 [fastapi]: https://img.shields.io/badge/fastapi-009688?style=for-the-badge&logo=fastapi&logoColor=black
 [sqlite]: https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white
