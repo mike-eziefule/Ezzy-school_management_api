@@ -15,7 +15,7 @@
 <!-- Project Logo -->
 <br />
 <div align="center">
-  <a href="https://github.com/mike-eziefule/Ezzy_Blog">
+  <a href="https://github.com/mike-eziefule/Ezzy-school_management_api">
     <img src="./images/EZZY-BLOG (1).png" alt="Logo" width="80%" height="20%">
   </a>
 </div>
@@ -24,14 +24,14 @@
 
 <div>
   <p align="center">
-    <a href="https://github.com/mike-eziefule/Ezzy_Blog_api/blob/main/README.md"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/README.md"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://www.loom.com/share/ed3cc4bfb8c743cd9371e2831a7785ec?sid=4be6af19-e752-4289-a180-bf065c0bd58a">View Demo</a>
     ·
-    <a href="https://github.com/mike-eziefule/Ezzy_Blog/issues">Report Bug</a>
+    <a href="https://github.com/mike-eziefule/Ezzy-school_management_api/issues">Report Bug</a>
     ·
-    <a href="https://github.com/mike-eziefule/Ezzy_Blog/issues">Request Feature</a>
+    <a href="https://github.com/mike-eziefule/Ezzy-school_management_api/issues">Request Feature</a>
   </p>
 </div
 ---
@@ -41,7 +41,7 @@
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#about-Ezzy-blog">About Ezzy School Manager</a>
+      <a href="#about-Ezzy-School_Manager">About Ezzy School Manager</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
       </ul>
@@ -67,13 +67,9 @@
 ---
 
 <!-- About the Blog. -->
-## About Ezzy Blog
+## About Ezzy-school_manager_api
 
-
-
-
-
-This is a school management API that helps education administrators manage all academic records and activities within their institution.
+This is a school manager API that helps education administrators manage all academic records and activities within their institution.
 The app caters for three set of users; the administrator, the staff and the students.
 
 All users are required to first sign up by entering an email, password and selecting a user type/role in this case "admin", "staff" or "student".
@@ -82,7 +78,8 @@ Upon signup, user should be able to login by inputting provided email address an
 
 All routes requires user to be logged in before they can perform other functionalities. Some available functions includes:
 
-1. THE LECTURERS:
+
+### 1. THE LECTURERS:
 
 * Lecturers are to sign up using the staff signup route.
 
@@ -96,7 +93,8 @@ All routes requires user to be logged in before they can perform other functiona
 
 * After grading, only admins can modify students results.
 
-2. THE STUDENT:
+
+### 2. THE STUDENT:
 
 * Students are to sign up using the student signup route.
 
@@ -112,7 +110,8 @@ All routes requires user to be logged in before they can perform other functiona
 
 * Students can view CGPA ONLY when ALL results of his/her registered courses have been graded.
 
-3. THE ADMIN:
+
+### 3. THE ADMIN:
 
 * Administrators are to sign up using the admin signup route.
 
@@ -167,11 +166,11 @@ Python3: [Get Python](https://www.python.org/downloads/)
 
 1. Clone this repo
    ```sh
-   git clone https://github.com/mike-eziefule/Ezzy_Blog_api.git
+   git clone https://https://github.com/mike-eziefule/Ezzy-school_management_api.git
    ```
-2. Activate the virtual environment
+2. Activate the virtual environment(Bash on windows os)
    ```sh
-   source virtual/Scripts/activate
+   source virtualenv/Scripts/activate
    ```
 3. Install project packages
    ```sh
@@ -214,7 +213,7 @@ Python3: [Get Python](https://www.python.org/downloads/)
 <!-- License -->
 ## License
 
-Distributed under the MIT License. See <a href="https://github.com/mike-eziefule/Ezzy_Blog_api/blob/main/LICENSE">LICENSE</a> for more information.
+Distributed under the MIT License. See <a href="https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/LICENSE">LICENSE</a> for more information.
 
 <p align="right"><a href="#readme-top">back to top</a></p>
 
@@ -251,15 +250,15 @@ This project was made possible by:
 
 <!-- Markdown Links & Images -->
 [contributors-shield]: https://img.shields.io/github/contributors/mike-eziefule/Ezzy_Blog_api
-[contributors-url]: https://github.com/mike-eziefule/Ezzy_Blog_api/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/mike-eziefule/Ezzy_Blog_api
-[forks-url]: https://github.com/mike-eziefule/Ezzy_Blog_api/network/members
-[stars-shield]: https://img.shields.io/github/stars/mike-eziefule/Ezzy_Blog_api
+[contributors-url]: https://github.com/mike-eziefule/Ezzy-school_management_api/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/mike-eziefule/Ezzy-school_management_api
+[forks-url]: https://github.com/mike-eziefule/Ezzy-school_management_api/network/members
+[stars-shield]: https://img.shields.io/github/stars/mike-eziefule/Ezzy-school_management_api
 [stars-url]: https://github.com/mike-eziefule/Ezzy_Blog_api/stargazers
-[issues-shield]: https://img.shields.io/github/issues/mike-eziefule/Ezzy_Blog_api
-[issues-url]: https://github.com/mike-eziefule/Ezzy_Blog_api/issues
-[license-shield]: https://img.shields.io/github/license/mike-eziefule/Ezzy_Blog_api
-[license-url]: https://github.com/mike-eziefule/Ezzy_Blog_api/blob/main/LICENSE
+[issues-shield]: https://img.shields.io/github/issues/mike-eziefule/Ezzy-school_management_api
+[issues-url]: https://github.com/mike-eziefule/Ezzy-school_management_api/issues
+[license-shield]: https://img.shields.io/github/license/mike-eziefule/Ezzy-school_management_api
+[license-url]: https://github.com/mike-eziefule/Ezzy-school_management_api/blob/main/LICENSE
 [twitter-shield]: https://img.shields.io/twitter/follow/EziefuleMichael
 [twitter-url]: https://twitter.com/EziefuleMichael
 [Ezzy-blog-screenshot-pg1]:images/ezzy_blogpage1.png
