@@ -69,29 +69,33 @@
 <!-- About the Blog. -->
 ## About Ezzy-school_manager_api
 
-This is a school manager API that helps education administrators manage all academic records and activities within their institution.
+This is a school manager API that helps educators manage all academic records and activities within their institution.
 The app caters for three set of users; the administrator, the staff and the students.
 
-All users are required to first sign up by entering an email, password and selecting a user type/role in this case "admin", "staff" or "student".
+All users are required to first sign up using a route specific to each user type by providing an email address and a password. Available user type includes "admin", "staff" and "student".
 
-Upon signup, user should be able to login by inputting provided email address and password entered during signup.
+Upon signup, user should be able to login using the email address and password provided during signup.
 
-All routes requires user to be logged in before they can perform other functionalities. Some available functions includes:
+All routes require users to be logged in before they can perform other functions. Some available functions includes:
 
 
 ### 1. THE LECTURERS:
 
 * Lecturers are to sign up using the staff signup route.
 
-* Upon signup and login: lecturers will be able to create a profile by entering their firstname, lastname and gender. A unique staff number will be automatically generated afterwards.
+* Upon signup and login, lecturers will be able to create a profile by entering their firstname, lastname and gender. A unique staff number will be automatically generated afterwards.
 
-* Lecturers are required to add/create the course/courses he/she will be curating by entering the course title and course code. This action must be completed before students can register courses.
+* Lecturers can then add/create the course/courses he/she will be curating by entering the course title and course code. This action must be completed before students can register for the courses.
 
 * Lecturers can edit any mistakes noticed during creation of course, this updated will be reflected across board.
 
-* Lerturers can view students who registered for their course and grade those students accordingly.
+* Lecturers can also delete their course, provided no students have registered yet. hence, it is advisable to conclude course upload before student registration starts.
+
+* Lecturers can view students who registered for their course and grade those students accordingly.
 
 * After grading, only admins can modify students results.
+
+* strict restrictions have been placed to confine lecturers manipulations to their courses and students alone, ie, lecturer A cannot modify, delete or grade students of lecturer B.
 
 
 ### 2. THE STUDENT:
@@ -100,9 +104,11 @@ All routes requires user to be logged in before they can perform other functiona
 
 * Upon signup and login, the student will be able to create a profile by entering their firstname, lastname, dob, origin and gender. A unique   matric number will be automatically generated afterwards.
 
-* Students are required to register all courses he/she will offer by entering/selecting the course code. Only registered courses can be graded by course lecturers.
+* Students are required to register all courses he/she will offer by entering/selecting the course code, provided the course lecturer has uploaded the course. 
 
-* In event of mistakes during registration, the student can delete wrongly registered courses, however, his/her login password will be required.
+* Only registered courses can be graded by course lecturers, therefore, studentd who fail to register a course cannot get results.
+
+* In event of mistakes during registration, the student can delete wrongly registered courses, provided such course hasnt been graded by the lecturer. However, his/her login password will be required.
 
 * Students can view course information and details of assigned lecturer taking the course.
 

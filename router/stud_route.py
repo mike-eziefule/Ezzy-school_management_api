@@ -181,7 +181,7 @@ async def my_cgpa(db:Session=Depends(reusables_codes.get_db), token:str=Depends(
 
 #DELETE A REGISTERED COURSE BY STUDENT
 @stud_app.delete('/delete_registered_course', status_code=202)
-async def delete_my_courses(course_id: int, password: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+async def delete_my_courses(course_code:str, password: str, db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
 
     #authentication
     user = reusables_codes.get_user_from_token(db, token)
@@ -190,13 +190,30 @@ async def delete_my_courses(course_id: int, password: str, db:Session=Depends(re
     if password != user.password:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail= "PASSWORD IS INCORRECT")
     
-    #verify student.
+    #verify student id.
     get_student = db.query(Students).filter(Students.owner_id == user.id).first()
     
     if not get_student:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail= "NON STUDENT DETECTED, PLEASE SIGN IN AS A STUDENT"
+        )
+    
+    #verify course id.
+    get_course = db.query(Courses).filter(Courses.course_code == course_code).first()
+    
+    if not get_course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail= "NO MATCH FOUND, TRY AGAIN!"
+        )
+        
+    #verify IF course has been graded.
+    view_grading = db.query(Grading).filter(Grading.student == get_student.id, Grading.course == get_course.id).first()
+    if view_grading:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail= "SORRY, THIS COURSE HAS BEEN GRADED. PLEASE CONTACT AN ADMINISTRATOR"
         )
     
     #verify and delete course.
@@ -209,7 +226,7 @@ async def delete_my_courses(course_id: int, password: str, db:Session=Depends(re
         )
         
     for data in view_course.all():
-        if (data.courses == course_id) is True:
+        if (data.courses == get_course.id) is True:
             
             db.delete(data)
             db.commit()
