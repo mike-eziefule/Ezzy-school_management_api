@@ -41,7 +41,7 @@
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#about-Ezzy-blog">About Ezzy Blog</a>
+      <a href="#about-Ezzy-blog">About Ezzy School Manager</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
       </ul>
@@ -69,6 +69,10 @@
 <!-- About the Blog. -->
 ## About Ezzy Blog
 
+
+
+
+
 This is a school management API that helps education administrators manage all academic records and activities within their institution.
 The app caters for three set of users; the administrator, the staff and the students.
 
@@ -80,43 +84,43 @@ All routes requires user to be logged in before they can perform other functiona
 
 1. THE LECTURERS:
 
-  Lecturers are to sign up using the staff signup route.
+* Lecturers are to sign up using the staff signup route.
 
-  Upon signup and login: lecturers will be able to create a profile by entering their firstname, lastname and gender. A unique staff number will be automatically generated afterwards.
+* Upon signup and login: lecturers will be able to create a profile by entering their firstname, lastname and gender. A unique staff number will be automatically generated afterwards.
 
-  Lecturers are required to add/create the course/courses he/she will be curating by entering the course title and course code. This action must be completed before students can register courses.
+* Lecturers are required to add/create the course/courses he/she will be curating by entering the course title and course code. This action must be completed before students can register courses.
 
-  Lecturers can edit any mistakes noticed during creation of course, this updated will be reflected across board.
+* Lecturers can edit any mistakes noticed during creation of course, this updated will be reflected across board.
 
-  Lerturers can view students who registered for their course and grade those students accordingly.
+* Lerturers can view students who registered for their course and grade those students accordingly.
 
-  After grading, only admins can modify students results.
+* After grading, only admins can modify students results.
 
 2. THE STUDENT:
 
-  Students are to sign up using the student signup route.
+* Students are to sign up using the student signup route.
 
-  Upon signup and login, the student will be able to create a profile by entering their firstname, lastname, dob, origin and gender. A unique matric number will be automatically generated afterwards.
+* Upon signup and login, the student will be able to create a profile by entering their firstname, lastname, dob, origin and gender. A unique   matric number will be automatically generated afterwards.
 
-  Students are required to register all courses he/she will offer by entering/selecting the course code. Only registered courses can be graded by course lecturers.
+* Students are required to register all courses he/she will offer by entering/selecting the course code. Only registered courses can be graded by course lecturers.
 
-  In event of mistakes during registration, the student can delete wrongly registered courses, however, his/her login password will be required.
+* In event of mistakes during registration, the student can delete wrongly registered courses, however, his/her login password will be required.
 
-  Students can view course information and details of assigned lecturer taking the course.
+* Students can view course information and details of assigned lecturer taking the course.
 
-  Students can view results only when course lecturer has graded it.
+* Students can view results only when course lecturer has graded it.
 
-  Students can view CGPA ONLY when ALL results of his/her registered courses have been graded.
+* Students can view CGPA ONLY when ALL results of his/her registered courses have been graded.
 
 3. THE ADMIN:
 
-  Administrators are to sign up using the admin signup route.
+* Administrators are to sign up using the admin signup route.
 
-  Upon signup and login, the admin will be able to create a profile by entering their username and designation using the register admin route. A unique admin number will be automatically generated afterwards. 
+* Upon signup and login, the admin will be able to create a profile by entering their username and designation using the register admin route. A unique admin number will be automatically generated afterwards. 
 
-  Admins can view detailed information of all students, all results, all lecturers registered on the platform.
+* Admins can view detailed information of all students, all results, all lecturers registered on the platform.
 
-  Admin alone can edit results in event of a mistake made. An modification will automatically be effected in the overall CGPA calculation of the student.
+* Admin alone can edit results in event of a mistake made. An modification will automatically be effected in the overall CGPA calculation of the student.
 
 Ezzy School Manager was built by <a href="https://github.com/mike-eziefule/">Eziefule Michael</a>, a Backend Engineering student at <a href="https://engineering.altschoolafrica.com/">AltSchool Africa</a> who's learning to create magic with the Python FastAPI framework.
 
