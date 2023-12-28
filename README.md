@@ -264,9 +264,9 @@ This project was made possible by:
 [twitter-shield]: https://img.shields.io/twitter/follow/EziefuleMichael
 [twitter-url]: https://twitter.com/EziefuleMichael
 [Ezzy-school-screenshot-pg1]:images/ezzyschool1.png
-[Ezzy-school-screenshot-pg1]:images/ezzyschool2.png
-[Ezzy-school-screenshot-pg1]:images/ezzyschool3.png
-[Ezzy-school-screenshot-pg1]:images/ezzyschool.png
+[Ezzy-school-screenshot-pg2]:images/ezzyschool2.png
+[Ezzy-school-screenshot-pg3]:images/ezzyschool3.png
+[Ezzy-school-screenshot-pg4]:images/ezzyschool4.png
 [python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 [fastapi]: https://img.shields.io/badge/fastapi-009688?style=for-the-badge&logo=fastapi&logoColor=black
 [sqlite]: https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white
