@@ -79,7 +79,7 @@ Upon signup, user should be able to login using the email address and password p
 All routes require users to be logged in before they can perform other functions. Some available functions includes:
 
 
-### 1. THE LECTURERS:
+#### 1. THE LECTURERS:
 
 * Lecturers are to sign up using the staff signup route.
 
@@ -98,7 +98,7 @@ All routes require users to be logged in before they can perform other functions
 * strict restrictions have been placed to confine lecturers manipulations to their courses and students alone, ie, lecturer A cannot modify, delete or grade students of lecturer B.
 
 
-### 2. THE STUDENT:
+#### 2. THE STUDENT:
 
 * Students are to sign up using the student signup route.
 
@@ -117,7 +117,7 @@ All routes require users to be logged in before they can perform other functions
 * Students can view CGPA ONLY when ALL results of his/her registered courses have been graded.
 
 
-### 3. THE ADMIN:
+#### 3. THE ADMIN:
 
 * Administrators are to sign up using the admin signup route.
 

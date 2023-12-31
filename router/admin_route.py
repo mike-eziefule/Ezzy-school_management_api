@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schema.user_schema import CreateAdmin, showAdmin, showCreateLect, showCreateStudent
+from schema.user_schema import CreateAdmin, showAdmin, showCreateLect, showCreateStudent, showFinance
 from schema.course_schema import showResultModel, showNewCourse
 from sqlalchemy.orm import Session
 from service.utils import reusables_codes
-from database.dbmodel import Admin, Lecturers, Students, Courses, Grading
+from database.dbmodel import Admin, Lecturers, Students, Courses, Grading, Finances
 from router.auth_route import oauth2_scheme
+from datetime import datetime
 
 
 #access the fastapi attributes
@@ -49,6 +50,57 @@ async def register_admin(profile:CreateAdmin, db:Session=Depends(reusables_codes
     )
     
 
+
+#LOG PAYMENT STATUS UPON RECIEPT OF STUDENTS PAYMENT.
+@adm_app.post('/lodge_payment', response_model = showFinance, status_code = 201)
+async def lodge_payment(matric_no: str = "U2024/3015/1001", db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
+
+    #authentication
+    user = reusables_codes.get_user_from_token(db, token)
+    
+    #authentication
+    if user.user_type != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail=f"ACCESS_DENIED!!! ONLY ADMINS CAN ACCESS HERE"
+        )
+    
+    get_admin = db.query(Admin).filter(Admin.owner_id == user.id).first()
+    if not get_admin:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Unknown Administrator, Kindly Register your Account"
+        )
+    
+    #match mat_no with student id   
+    get_student = db.query(Students).filter(Students.matric_no == matric_no).first()
+    if not get_student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Not found or Incorrect Matric Number"
+        )
+        
+    #duplicate restrictions
+    find_duplicate = db.query(Finances).filter(Finances.student_id == get_student.id).first()
+    if find_duplicate:
+        raise HTTPException(
+            status_code=status.HTTP_208_ALREADY_REPORTED, 
+            detail="Already Posted this payment"
+        )
+    
+    if get_student:    
+        new_payment = Finances(
+            student_id = get_student.id,
+            payment_status = "Paid", 
+            DateTime = datetime.now().strftime("%Y-%m-%d %H:%M%S"),
+        )
+        
+        db.add(new_payment)
+        db.commit()
+        db.refresh(new_payment)
+        return new_payment
+
+
 #SEE ALL PROVISIONAL COURSES BY ADMIN
 @adm_app.get('/all_courses', response_model= list[showNewCourse], status_code=202)
 async def all_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depends(oauth2_scheme)):
@@ -74,7 +126,10 @@ async def all_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depe
     #get all students
     all_courses = db.query(Courses).all()
     if not all_courses:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"NO STUDENT RECORD FOUND")      
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"NO STUDENT RECORD FOUND"
+        )      
     return all_courses
 
 #SEE ALL STUDENTS ADMIN
@@ -102,7 +157,10 @@ async def all_students(db:Session=Depends(reusables_codes.get_db), token:str=Dep
     #get all students
     all_students = db.query(Students).all()
     if not all_students:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"NO STUDENT RECORD FOUND")      
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"NO STUDENT RECORD FOUND"
+        )      
     return all_students
 
 
@@ -131,7 +189,10 @@ async def all_staff(db:Session=Depends(reusables_codes.get_db), token:str=Depend
     #get all staff
     all_staff = db.query(Lecturers).all()
     if not all_students:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"NO LECTURER RECORD FOUND")      
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"NO LECTURER RECORD FOUND"
+        )      
     return all_staff
 
 #VIEW LECTURERS DETAIL BY ADMIN
@@ -159,7 +220,10 @@ async def check_staff_no(staff_no: str = "EZ-S501", db:Session=Depends(reusables
     get_lecturer = db.query(Lecturers).filter(Lecturers.staff_no == staff_no)
     
     if not get_lecturer.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="NO RECORD OR INVALID LECTURER ID ENTERED")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="NO RECORD OR INVALID LECTURER ID ENTERED"
+        )
     
     return get_lecturer.first()
 

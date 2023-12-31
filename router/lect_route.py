@@ -49,7 +49,10 @@ async def add_new_course(input: newCourse, db:Session=Depends(reusables_codes.ge
     
     #authentication
     if user.user_type != "staff":
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"ACCESS_DENIED!!! ONLY STAFF CAN REGISTER COURSE")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail=f"ACCESS_DENIED!!! ONLY STAFF CAN REGISTER COURSE"
+        )
     
     #checking if course is already registered
     get_course = db.query(Courses).filter(Courses.course_code == input.course_code)
@@ -57,7 +60,10 @@ async def add_new_course(input: newCourse, db:Session=Depends(reusables_codes.ge
     #getting lecturer information or id
     get_lecturer = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
     if not get_lecturer:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"STAFF INFORMATION NOT FOUND, KINDLY COMPLETE YOUR PROFILE")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"STAFF INFORMATION NOT FOUND, KINDLY COMPLETE YOUR PROFILE"
+        )
     
     if not get_course.first():    
         new_course = Courses(
@@ -72,7 +78,8 @@ async def add_new_course(input: newCourse, db:Session=Depends(reusables_codes.ge
     
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED, 
-        detail=f"COURSE ALREADY REGISTERED AS >>> {input.course_code.upper()} <<<")
+        detail=f"COURSE ALREADY REGISTERED AS >>> {input.course_code.upper()} <<<"
+    )
 
 
 #GRADE A STUDENT BY COURSE LECTURER
@@ -83,25 +90,40 @@ async def grade_students(input:GradeModel, db:Session=Depends(reusables_codes.ge
     user = reusables_codes.get_user_from_token(db, token)
     
     if input.percent_grade > 100:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="GRADE CANNOT EXCEED 100 %")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="GRADE CANNOT EXCEED 100 %"
+        )
 
     #Check if the students matric number exists.
     get_student =  db.query(Students).filter(Students.matric_no == input.student_matric_no).first()
     if not get_student:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"MATRIC_NUMBER INCORRECT OR UNREGISTERED!!!")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"MATRIC_NUMBER INCORRECT OR UNREGISTERED!!!"
+        )
     
     #get signed in user.
     get_lecturer = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
     if not get_lecturer:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="DENIED!!! KINDLY REGISTER AS A LECTURER.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="DENIED!!! KINDLY REGISTER AS A LECTURER."
+        )
     
     #checking if course lecturer is grading his/her course.
     get_course = db.query(Courses).filter(Courses.course_code == input.course_code).first()
     if not get_course:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="COURSE-CODE IS INCORRECT OR UNREGISTERED, TRY LATER")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="COURSE REGISTERED TO ANOTHER LECTURER, TRY AGAIN"
+        )
     
     if get_course.lecturer != get_lecturer.id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"ACCESS_DENIED!!! YOU ARE NOT THE COURSE LECTURER")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="ACCESS_DENIED!!! YOU ARE NOT THE COURSE LECTURER"
+        )
     
     #checking if course is already graded by authenticated lecturer
     get_student_grade = db.query(Grading).filter(Grading.student == get_student.id, Grading.course == get_course.id)
@@ -110,7 +132,7 @@ async def grade_students(input:GradeModel, db:Session=Depends(reusables_codes.ge
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, 
                 detail = f"MATRIC NO.:{get_student.matric_no.upper()} ALREADY GRADED WITH {row.percent_grade}% IN {get_course.course_code}"
-                )
+            )
         
     #Check if the students is taking the course.
     get_reg_student = db.query(Student_course).filter(Student_course.student == get_student.id, Student_course.courses == get_course.id)
@@ -150,7 +172,10 @@ async def my_courses(db:Session=Depends(reusables_codes.get_db), token:str=Depen
     #verify student's matric_no.
     view_course = db.query(Courses).filter(Courses.lecturer == get_staff.id)
     if not view_course.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="LIST IS EMPTY, KINDLY REGISTER A COURSE")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="LIST IS EMPTY, KINDLY REGISTER A COURSE"
+        )
     
     return  view_course.all()
 
@@ -164,17 +189,26 @@ async def my_students(course_code: str, db:Session=Depends(reusables_codes.get_d
     #get lecturers id of logged-in USER
     get_userid  = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
     if not get_userid:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="UNAUTHORIZED, YOU ARE NOT A LECTURER!") 
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="UNAUTHORIZED, YOU ARE NOT A LECTURER!"
+        ) 
     
     #CONVERT course code to course id
     check_course_code = db.query(Courses).filter(Courses.course_code == course_code).first()
     if not check_course_code:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COURSE CODE IS INCORRECT OR UNPUBLISHED, TRY AGAIN")      
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="COURSE CODE IS INCORRECT OR UNPUBLISHED, TRY AGAIN"
+        )      
     
     #get id of logged in lecturer
     get_lectid = db.query(Student_course).filter(Student_course.lecturer == get_userid.id, Student_course.courses == check_course_code.id)
     if not get_lectid.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"NO STUDENT RECORD FOUND FOR {check_course_code.course_title}")      
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"NO STUDENT RECORD FOUND FOR {check_course_code.course_title}"
+        )      
 
     return get_lectid.all()
 
@@ -189,17 +223,26 @@ async def my_student_result(course_code:str, db:Session=Depends(reusables_codes.
     #verify logged-in user and retreive staff id.
     get_staff = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
     if not get_staff:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="ONLY LECTURERS ARE ALLOWED")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="ONLY LECTURERS ARE ALLOWED"
+        )
 
     #CONVERT course code to course id
     check_course_code = db.query(Courses).filter(Courses.course_code == course_code).first()
     if not check_course_code:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COURSE CODE IS INCORRECT OR UNPUBLISHED, TRY AGAIN")      
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="COURSE CODE IS INCORRECT OR UNPUBLISHED, TRY AGAIN"
+        )      
 
     #get student record by filtering course id and lecturer id
     results = db.query(Grading).filter(Grading.course == check_course_code.id, Grading.lecturer == get_staff.id)
     if not results.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NO RESULTS FOUND, TRY AGAIN LATER")    
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="NO RESULTS FOUND, TRY AGAIN LATER"
+        )    
     
     return results.all()
 
@@ -213,7 +256,10 @@ async def edit_my_course(course_id:int, input:newCourse, db:Session=Depends(reus
     #verify logged-in user.
     get_staff = db.query(Lecturers).filter(Lecturers.owner_id == user.id).first()
     if not get_staff:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="ONLY LECTURERS ARE ALLOWED")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="ONLY LECTURERS ARE ALLOWED"
+        )
 
     modify_course = db.query(Courses).filter(Courses.id == course_id)
     if not modify_course.first():
@@ -234,5 +280,5 @@ async def edit_my_course(course_id:int, input:newCourse, db:Session=Depends(reus
         status_code=status.HTTP_202_ACCEPTED,
         detail='Course Information updated successfully'
     )
-    
+
 

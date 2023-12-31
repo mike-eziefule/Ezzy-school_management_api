@@ -1,5 +1,5 @@
 from pydantic import EmailStr, BaseModel
-from datetime import date
+from datetime import date, datetime
 
 class UserBase(BaseModel):
     email : EmailStr
@@ -63,5 +63,13 @@ class CreateLect(BaseUser):
 class showCreateLect(CreateLect):
     staff_no: str
     # owner : showUserSignup
+    class Config:
+        orm_mode = True
+        
+class showFinance(BaseModel):
+    
+    student_id : int
+    payment_status: str
+    DateTime: datetime
     class Config:
         orm_mode = True

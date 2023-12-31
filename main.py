@@ -23,7 +23,7 @@ app = FastAPI(
     openapi_tags= setting.TAGS
 )
 
-#Address middleware restriction in case of hosting the api
+#remove middleware restriction when hosting api
 origins = ["*"]
 
 app.add_middleware(
